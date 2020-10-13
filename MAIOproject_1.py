@@ -12,32 +12,40 @@ df['lat'] = df['lat'].mask(df['lat'] < 66)
 df['lat']  = df['lat'].mask(df['lat'] > 68)
 df['lat']  = df['lat'].mask(df['lat'] == 0)
 
-NrYears = df.nr2.unique()
-Data = {elem : pd.DataFrame for elem in NrYears}
+NrJumps = df.nr2.unique()
+Data = {elem : pd.DataFrame for elem in NrJumps}
 
 for key in Data.keys():
     Data[key] = df[:][df.nr2 == key]
     
-## Nu staat de data in een dictionary waarbij ik ze dus heb gesplitst op hun getal in de laatste kolom,
-## dus iedere keer dat ze verplaatst zijn in een ander boorgat
+
     
-RollingMean = {elem : pd.DataFrame for elem in NrYears}
-RollingStd  = {elem : pd.DataFrame for elem in NrYears}
+RollingMean = {elem : pd.DataFrame for elem in NrJumps}
+RollingStd  = {elem : pd.DataFrame for elem in NrJumps}
+for key in Data.keys():
+    for key in RollingStd.keys():
+        RollingStd[key]  = Data[key].rolling(window=1,win_type='boxcar').std()
+
+threshold_lon = 0.0001
+threshold_lat = 0.0001
+
+for key in RollingStd.keys():
+    for i in range(RollingStd[key].index[0],(len(RollingStd[key]['lon'])-1)):
+        if np.abs(RollingStd[key]['lon'][i+1] - RollingStd[key]['lon'][i]) > threshold_lon:
+            Data[key]['lon'][i+1] = np.nan 
+        if np.abs(RollingStd[key]['lat'][i+1] - RollingStd[key]['lat'][i]) > threshold_lat:
+            Data[key]['lat'][i+1] = np.nan
+            
 for key in Data.keys():
     for key in RollingMean.keys():
         RollingMean[key] = Data[key].rolling(window=60,win_type='boxcar',min_periods = 10).mean()
-        RollingStd[key]  = Data[key].rolling(window=60,win_type='boxcar',min_periods = 10).std()
-     
-threshold = 0.1
+
+
+for key in Data.keys():
+    count = Data[key]['lon'].isna().sum()
+    
 for key in RollingStd.keys():
-    for i in range(len(RollingStd[key])-1):
-        if RollingStd[key,i+1] - RollingStd[key,i] > threshold:
-            Data[key,i+1] == np.nan
-            
-## Ik krijg in stukje code hierboven dus errors omdat hij het niet leuk vind als ik probeer te loopen over 
-## de dictionary en over de individuele punten van elke dataframe in 1 dictionary. 
-
-
-        
-        
-            
+    plt.scatter(Data[key]['lon'],Data[key]['lat'])
+    plt.xlabel('Degrees longitude')
+    plt.ylabel('Degrees latitude')
+    plt.show()
