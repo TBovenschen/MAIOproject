@@ -39,16 +39,35 @@ for key in Data.keys():
     plt.legend()
 plt.show()
 
-for i in range(1,len(Data)):
+#Convert dataframe to list of arrays
+Data_list = []
+for i in range(1,len(Data)+2):
     if i == 3:
-        i = 4
-    test = pd.concat(Data[i])
+        continue
+    Data_list.append(np.asarray(Data[i]))
 
+#%%
 # for i in range(len(Data)):
 #     Data[i].dropna(axis=0,inplace=True)
 #     Data[i].reset_index(drop=True,inplace=True)
-
-# for key in range(len(Data))
+# for i in range(9):
+#     Data_list[i] = np.ma.masked_invalid(Data_list[i])
+# for i in range(len(Data_list))
 #     for i in range(len(Data[key]))
 #         velocity = Data
+    
+# for i in range(len(Data_list)): 
+#     Data_list[i] = Data_list[i][~np.isnan(Data_list).any(axis=0),4]
+# test = Data_list[i]
+#%% Convert to velocity:
+Data_list_meter = Data_list
+for i in range(len(Data_list)):
+    Data_list_meter[i][:,4] = Data_list[i][:,4]*(40007863/180)
+    Data_list_meter[i][:,5] = Data_list[i][:,5]*(40075017/360*np.cos(67.09/180*np.pi))
+velocity = [0,1,2,3,4,5,6,7,8]
+for i in range(len(Data_list)):
+    velocity[i] = np.zeros(len(Data_list[i])-1)
+    for j in range(len(Data_list[i])-1):
+        velocity[i][j] = np.sqrt((Data_list[i][j+1,4]-Data_list[i][j,4])**2+
+                        (Data_list[i][j+1,5]-Data_list[i][j,5])**2)/(Data_list[i][j+1,0]-Data_list[i][j,0])
 
