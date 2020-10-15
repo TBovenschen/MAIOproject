@@ -26,8 +26,10 @@ latMasked = np.ma.masked_outside(lat,67,69)
 lonMasked = np.ma.masked_outside(lon,-50.5,-50.1)
 latMasked.filled(np.nan)
 lonMasked.filled(np.nan)
-    
 
+latMasked = latMasked[~np.isnan(latMasked).any(axis=0)]    
+lonMasked = lonMasked[~np.isnan(lonMasked)]   
+#%%
 
 #Range to calculate the moving average
 N = 100
