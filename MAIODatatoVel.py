@@ -45,6 +45,17 @@ for i in range(1,len(Data)+2):
     if i == 3:
         continue
     Data_list.append(np.asarray(Data[i]))
+    
+ 
+for key in Data.keys():
+    Data[key].dropna(axis=0,inplace=True)
+    Data[key].reset_index(drop=True,inplace=True)
+    
+RollingMean = {elem : pd.DataFrame for elem in Data}
+for key in RollingMean.keys():
+    RollingMean[key] = Data[key]
+    RollingMean[key]['lon']  = Data[key]['lon'].rolling(window=240,win_type='boxcar').mean()
+    RollingMean[key]['lat']  = Data[key]['lat'].rolling(window=240,win_type='boxcar').mean()
 
 #%%
 # for i in range(len(Data)):
