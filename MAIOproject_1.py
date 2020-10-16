@@ -73,14 +73,3 @@ def filterdata(obs_nr, filename, threshold_lon, threshold_lat):
     
     #######################################################################################
 
-    #%%
-    # Plot the filtered data
-    for key in Data.keys():
-        plt.scatter(Data[key]['lon'][1:-1],Data[key]['lat'][1:-1],s=4, label= key) # Laatste punt is bijna altijd slecht omdat RollingStd wordt berekend tot eind-1 dus in plot ook alles tot eind-1
-        plt.xlabel('Degrees longitude')
-        plt.ylabel('Degrees latitude')
-        plt.title('K-Transect #'+str(obs_nr)+' threshold_lat='+str(threshold_lat)+', threshold_lon='+str(threshold_lon))
-        plt.ticklabel_format(useOffset=False, style='plain')
-        plt.legend()
-    plt.show()
-    
