@@ -46,16 +46,10 @@ for i in range(1,len(Data)+2):
         continue
     Data_list.append(np.asarray(Data[i]))
     
- 
-for key in Data.keys():
-    Data[key].dropna(axis=0,inplace=True)
-    Data[key].reset_index(drop=True,inplace=True)
-    
-RollingMean = {elem : pd.DataFrame for elem in Data}
-for key in RollingMean.keys():
-    RollingMean[key] = Data[key]
-    RollingMean[key]['lon']  = Data[key]['lon'].rolling(window=240,win_type='boxcar').mean()
-    RollingMean[key]['lat']  = Data[key]['lat'].rolling(window=240,win_type='boxcar').mean()
+N = 240
+Data_list_mean = [0.0,1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0]
+for i in range(len(Data_list)):
+    Data_list_mean[i] = np.convolve(Data_list[i], np.ones((N,))/N, mode='valid')
 
 #%%
 # for i in range(len(Data)):
@@ -77,8 +71,8 @@ for i in range(len(Data_list)):
     Data_list_meter[i][:,5] = Data_list[i][:,5]*(40075017/360*np.cos(67.09/180*np.pi))
 velocity = [0,1,2,3,4,5,6,7,8]
 for i in range(len(Data_list)):
-    velocity[i] = np.zeros(len(Data_list[i])-1)
-    for j in range(len(Data_list[i])-1):
-        velocity[i][j] = np.sqrt((Data_list[i][j+1,4]-Data_list[i][j,4])**2+
-                        (Data_list[i][j+1,5]-Data_list[i][j,5])**2)/(Data_list[i][j+1,0]-Data_list[i][j,0])
+    velocity[i] = np.zeros(len(Data_list_mean[i])-1)
+    for j in range(len(Data_list_mean[i])-1):
+        velocity[i][j] = np.sqrt((Data_list_mean[i][j+1,4]-Data_list_mean[i][j,4])**2+
+                        (Data_list_mean[i][j+1,5]-Data_list_mean[i][j,5])**2)/(Data_list_mean[i][j+1,0]-Data_list_mean[i][j,0])
 

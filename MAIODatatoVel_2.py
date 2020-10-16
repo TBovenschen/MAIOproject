@@ -13,24 +13,27 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import time
 import pickle
+from MAIOproject_1 import filterdata
 
 start_time = time.time()
-
-
-# Load saved files:
-file_rollingStd = open('RollingStd.pkl','rb')
-RollingStd = pickle.load(file_rollingStd)
-file_rollingStd.close()
-file_rollingMean = open('RollingMean.pkl','rb')
-RollingMean = pickle.load(file_rollingMean)
-file_rollingMean.close()
-file_Data = open('DataPerYear.pkl', 'rb')
-Data = pickle.load(file_Data)
-file_Data.close()
-
+filename = 'Ktransect-SHR_input.txt'
 # Tresholds for the  filtering:
 threshold_lon = 1e-6
 threshold_lat = 1e-6
+
+filterdata(4, filename,1e-6,1e-6)
+# Load saved files:
+file_rollingStd = open(filename+'RollingStd.pkl','rb')
+RollingStd = pickle.load(file_rollingStd)
+file_rollingStd.close()
+# file_rollingMean = open('RollingMean.pkl','rb')
+# RollingMean = pickle.load(file_rollingMean)
+# file_rollingMean.close()
+file_Data = open(filename+'DataPerYear.pkl', 'rb')
+Data = pickle.load(file_Data)
+file_Data.close()
+
+
 
 # Plot the filtered data
 # for key in Data.keys():
@@ -66,21 +69,31 @@ for key in RollingMean.keys():
 #%% Convert to meters:
 
 for key in RollingMean.keys():
-    for i in range(RollingMean[key].index[0],(RollingMean[key].index[0]+len(RollingMean[key]['lon'])-1)):    
+    for i in range(RollingMean[key].index[0],(RollingMean[key].index[0]+len(RollingMean[key]['lon']))):    
         RollingMean[key]['lon'][i] = RollingMean[key]['lon'][i]*(40075017/360*np.cos(67.09/180*np.pi)) # Convert degrees to meters
         RollingMean[key]['lat'][i] = RollingMean[key]['lat'][i]*(40007863/180)                         # Convert degrees to meters
 
 #%% Calculate velocity
 
 Data_listRollingMean = []
-for i in range(1,len(RollingMean)+2):
-    if i == 3:
-        continue
+for i in Data.keys():
     Data_listRollingMean.append(np.asarray(Data[i]))
 
     
-Velocity = [0.0,1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0]                      
+velocity = list(range(0,len(Data)))                    
 
-
-                            
+for i in range(len(Data_listRollingMean)):
+    velocity[i] = np.zeros(len(Data_listRollingMean[i])-1)
+    for j in range(len(Data_listRollingMean[i])-1):
+        velocity[i][j] = (np.sqrt((Data_listRollingMean[i][j+1,4]-Data_listRollingMean[i][j,4])**2+
+                        (Data_listRollingMean[i][j+1,5]-Data_listRollingMean[i][j,5])**2)/
+                          (Data_listRollingMean[i][j+1,0]-Data_listRollingMean[i][j,0]))
+velocity_mean = list(range(0,len(Data)))  
+N=240
+for i in range(len(Data_listRollingMean)):
+    velocity_mean[i] = np.convolve(velocity[i], np.ones((N,))/N, mode='valid')
+#%%
+plt.figure()
+plt.plot(Data_listRollingMean[0][121:-120,0],velocity_mean[0][:-1]*24)
+plt.show()                            
 # print("--- %s seconds ---" % (time.time() - start_time))
