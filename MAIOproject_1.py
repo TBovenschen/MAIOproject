@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import time
 import pickle
 
-def filterdata(obs_nr, filename, threshold_lon, threshold_lat):
+def filterdata(obs_nr, filename, threshold_lon, threshold_lat,window_std):
     """Function to load, filter and plot GPS data. Data that has a higher standard deviation
     than the given tresholds is filtered out.
     INPUT: 
@@ -34,8 +34,6 @@ def filterdata(obs_nr, filename, threshold_lon, threshold_lat):
     df.reset_index(drop=True,inplace=True)
     #%%
     #The threshold of the difference in the rolling standard deviation after adding a data point:
-    threshold_lon = 1e-6
-    threshold_lat = 1e-6
     
     ###################### USE THIS TO CREATE AND FILTER THE DATA (ONLY FIRST TIME) ################
     #Devide the data in different array for when the station is replaced:
@@ -51,7 +49,7 @@ def filterdata(obs_nr, filename, threshold_lon, threshold_lat):
     RollingStd  = {elem : pd.DataFrame for elem in NrJumps}
     
     for key in RollingStd.keys():
-        RollingStd[key]  = Data[key].rolling(window=200,win_type='boxcar').std() 
+        RollingStd[key]  = Data[key].rolling(window=window_std,win_type='boxcar').std() 
     
     #Filter out the data that has a bigger standard deviation than the threshold:
     for key in RollingStd.keys():
