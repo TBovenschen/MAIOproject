@@ -39,6 +39,7 @@ S7_masked = np.ma.masked_invalid(velocity_S7)
 S8_masked = np.ma.masked_invalid(velocity_S8)  
 SHR_masked = np.ma.masked_invalid(velocity_SHR)  
 
+
 #%% Loading weather data
 
 df = pd.read_csv('grl_aws06_HOUR-maio.txt', comment ='#',delim_whitespace=(True))
