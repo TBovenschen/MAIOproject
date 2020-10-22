@@ -39,6 +39,7 @@ S7_masked = np.ma.masked_invalid(velocity_S7)
 S8_masked = np.ma.masked_invalid(velocity_S8)  
 SHR_masked = np.ma.masked_invalid(velocity_SHR)  
 
+<<<<<<< Updated upstream
 #%% Loading weather data
 
 df = pd.read_csv('Data/grl_aws06_HOUR-maio.txt', comment ='#',delim_whitespace=(True))
@@ -48,6 +49,8 @@ a = df[val_mask].index
 #%% 
 
 
+=======
+>>>>>>> Stashed changes
 msk = (~S4_masked[:,1].mask & ~S7_masked[:,1].mask)
 print(np.ma.corrcoef(S4_masked[msk,1],S7_masked[msk,1]))
 
@@ -56,6 +59,20 @@ print(np.ma.corrcoef(S4_masked[msk,1],S8_masked[msk,1]))
 
 msk = (~S7_masked[:,1].mask & ~S8_masked[:,1].mask)
 print(np.ma.corrcoef(S7_masked[msk,1],S8_masked[msk,1]))
+#%% Loading weather data
+
+wheatherdata = pd.read_csv('Data/grl_aws06_HOUR-maio.txt', comment ='#',delim_whitespace=(True))
+wheatherdata = wheatherdata[8780:]
+S4_masked = S4_masked[:-49]
+S7_masked = S7_masked[:-49]
+S8_masked = S8_masked[:-49]
+corr_weather_S4 = np.ma.corrcoef(S4_masked[:,1].data,wheatherdata['T'][S4_masked[:,1]])
+# a = df[val_mask].index
+
+#%% 
+
+
+
 
 #%% 
 df        = df[8780:]
