@@ -37,14 +37,14 @@ for nr in range(len(filenr)):
     file_Data.close()
     
 
-
+    plt.figure()
     for key in Data.keys():
         plt.scatter(Data[key]['lon'][50:-50],Data[key]['lat'][50:-50],s=4, label= key) # Laatste punt is bijna altijd slecht omdat RollingStd wordt berekend tot eind-1 dus in plot ook alles tot eind-1
-        plt.xlabel('Degrees longitude')
-        plt.ylabel('Degrees latitude')
-        plt.title('K-Transect ' + str(filenr[nr]) + ', threshold = '+str(threshold_lat))
-        plt.ticklabel_format(useOffset=False, style='plain')
-        plt.legend()
+    plt.xlabel('Degrees longitude')
+    plt.ylabel('Degrees latitude')
+    plt.title('K-Transect ' + str(filenr[nr]) + ', threshold = '+str(threshold_lat))
+    plt.ticklabel_format(useOffset=False, style='plain')
+    plt.legend()
     plt.show()
 
 #%%
