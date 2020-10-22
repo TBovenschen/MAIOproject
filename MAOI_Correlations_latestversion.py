@@ -39,7 +39,6 @@ S7_masked = np.ma.masked_invalid(velocity_S7)
 S8_masked = np.ma.masked_invalid(velocity_S8)  
 SHR_masked = np.ma.masked_invalid(velocity_SHR)  
 
-
 #%% Loading weather data
 
 df = pd.read_csv('Data/grl_aws06_HOUR-maio.txt', comment ='#',delim_whitespace=(True))
@@ -58,7 +57,19 @@ print(np.ma.corrcoef(S4_masked[msk,1],S8_masked[msk,1]))
 msk = (~S7_masked[:,1].mask & ~S8_masked[:,1].mask)
 print(np.ma.corrcoef(S7_masked[msk,1],S8_masked[msk,1]))
 
+#%% 
+df        = df[8780:]
+msk       = msk[:-49]
+S4_masked = S4_masked[:-49]
+S7_masked = S7_masked[:-49]
+S8_masked = S8_masked[:-49]
 
-
-
+#%%
+window = 240
+RollingMeanT = df['T'].rolling(window).mean()
+#%%
+RollingMeanT = RollingMeanT[240:]
+S4_masked = S4_masked[240:]
+msk = (~S4_masked[:,1].mask)
+print(np.ma.corrcoef(S4_masked[msk,1],RollingMeanT[msk])) 
 
