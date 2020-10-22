@@ -41,7 +41,23 @@ SHR_masked = np.ma.masked_invalid(velocity_SHR)
 
 #%% Loading weather data
 
-df = pd.read_csv('grl_aws06_HOUR-maio.txt', comment ='#',delim_whitespace=(True))
+df = pd.read_csv('Data/grl_aws06_HOUR-maio.txt', comment ='#',delim_whitespace=(True))
 val_mask = df['Date'] == '2009/9/3' 
 a = df[val_mask].index
+
+#%% 
+
+
+msk = (~S4_masked[:,1].mask & ~S7_masked[:,1].mask)
+print(np.ma.corrcoef(S4_masked[msk,1],S7_masked[msk,1]))
+
+msk = (~S4_masked[:,1].mask & ~S8_masked[:,1].mask)
+print(np.ma.corrcoef(S4_masked[msk,1],S8_masked[msk,1]))
+
+msk = (~S7_masked[:,1].mask & ~S8_masked[:,1].mask)
+print(np.ma.corrcoef(S7_masked[msk,1],S8_masked[msk,1]))
+
+
+
+
 
