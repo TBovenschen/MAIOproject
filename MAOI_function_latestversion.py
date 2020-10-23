@@ -48,6 +48,7 @@ def filterdata(obs_nr, filename, threshold_lon, threshold_lat,window_std):
     #Create dictionaries for rolling standard deviation  
     RollingStd  = {elem : pd.DataFrame for elem in NrJumps}
     
+    #Compute the rolling standard deviation
     for key in RollingStd.keys():
         RollingStd[key]  = Data[key].rolling(window=window_std,win_type='boxcar').std() 
     

@@ -32,7 +32,7 @@ file_velocity = open(filename+'.pkl','rb')
 velocity_S8 = pickle.load(file_velocity)
 velocity_S8 = velocity_S8.astype(float)
 
-#%%  In order to correlate, matrices must be same size right? 
+#%%  In order to correlate, matrices must be same size 
 
 S4_masked = np.ma.masked_invalid(velocity_S4)  
 S7_masked = np.ma.masked_invalid(velocity_S7)  
@@ -40,8 +40,7 @@ S8_masked = np.ma.masked_invalid(velocity_S8)
 SHR_masked = np.ma.masked_invalid(velocity_SHR)  
 
 
-#%% 
-
+#%% Combine the masks and print the correlation coefficients
 
 msk = (~S4_masked[:,1].mask & ~S7_masked[:,1].mask)
 print(np.ma.corrcoef(S4_masked[msk,1],S7_masked[msk,1]))
