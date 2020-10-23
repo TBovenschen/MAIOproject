@@ -39,18 +39,10 @@ S7_masked = np.ma.masked_invalid(velocity_S7)
 S8_masked = np.ma.masked_invalid(velocity_S8)  
 SHR_masked = np.ma.masked_invalid(velocity_SHR)  
 
-<<<<<<< Updated upstream
-#%% Loading weather data
-
-df = pd.read_csv('Data/grl_aws06_HOUR-maio.txt', comment ='#',delim_whitespace=(True))
-val_mask = df['Date'] == '2009/9/3' 
-a = df[val_mask].index
 
 #%% 
 
 
-=======
->>>>>>> Stashed changes
 msk = (~S4_masked[:,1].mask & ~S7_masked[:,1].mask)
 print(np.ma.corrcoef(S4_masked[msk,1],S7_masked[msk,1]))
 
@@ -61,32 +53,53 @@ msk = (~S7_masked[:,1].mask & ~S8_masked[:,1].mask)
 print(np.ma.corrcoef(S7_masked[msk,1],S8_masked[msk,1]))
 #%% Loading weather data
 
-wheatherdata = pd.read_csv('Data/grl_aws06_HOUR-maio.txt', comment ='#',delim_whitespace=(True))
-wheatherdata = wheatherdata[8780:]
+weatherdata = pd.read_csv('Data/grl_aws06_HOUR-maio.txt', comment ='#',delim_whitespace=(True))
+weatherdata = weatherdata[8780:]
 S4_masked = S4_masked[:-49]
 S7_masked = S7_masked[:-49]
 S8_masked = S8_masked[:-49]
-corr_weather_S4 = np.ma.corrcoef(S4_masked[:,1].data,wheatherdata['T'][S4_masked[:,1]])
+corr_weather_S4 = np.ma.corrcoef(S4_masked[~S4_masked[:,1].mask,1],weatherdata['T'][~S4_masked[:,1].mask])
 # a = df[val_mask].index
 
-#%% 
+#%%
+weatherdata['T'] = weatherdata['T'].mask(weatherdata['T']<-100)
+weatherdata['T'] = weatherdata['T'].mask(weatherdata['T']>25) #lower limit of longitude (deterimined visually)
 
+N=100
+Temp = np.asarray(weatherdata['T']) 
+Temp_masked = np.ma.masked_invalid(Temp)  
+Temp_rollingmean = np.ma.convolve(Temp_masked, np.ones((N,))/N, mode='same')
+msk = (~S4_masked[:,1].mask & ~Temp_rollingmean.mask)
+corr_weather_S4 = np.ma.corrcoef(S4_masked[msk,1],Temp_rollingmean[msk])
 
+plt.figure()
+plt.plot(np.arange(len(Temp_rollingmean)),Temp_rollingmean/abs(np.min(Temp_rollingmean)))
+plt.plot(np.arange(len(Temp_rollingmean)), S4_masked[:,1]/np.max(S4_masked[:,1]))
+plt.show()
 
+weatherdata['M'] = weatherdata['M'].mask(weatherdata['M']<-200)
+# meltwire = np.asarray(weatherdata['M'])
+# meltwire_masked = np.ma.masked_invalid(meltwire)
+plt.figure()
+plt.plot(np.arange(len(weatherdata['M'])),weatherdata['M'])
 
-#%% 
-df        = df[8780:]
-msk       = msk[:-49]
-S4_masked = S4_masked[:-49]
-S7_masked = S7_masked[:-49]
-S8_masked = S8_masked[:-49]
+plt.show()
 
 #%%
-window = 240
-RollingMeanT = df['T'].rolling(window).mean()
-#%%
-RollingMeanT = RollingMeanT[240:]
-S4_masked = S4_masked[240:]
-msk = (~S4_masked[:,1].mask)
-print(np.ma.corrcoef(S4_masked[msk,1],RollingMeanT[msk])) 
+# window = 240
+# RollingMeanT = df['T'].rolling(window).mean()
+# #%%
+# RollingMeanT = RollingMeanT[240:]
+# S4_masked = S4_masked[240:]
+# msk = (~S4_masked[:,1].mask)
+# print(np.ma.corrcoef(S4_masked[msk,1],RollingMeanT[msk])) 
 
+acceleration = np.zeros(len(S7_masked)-1)
+for i in range(len(S7_masked)-1):
+    acceleration[i] = (S7_masked[i+1,1] - S7_masked[i,1])
+acceleration = np.ma.masked_outside(acceleration,-0.001,0.001)
+acceleration = np.ma.convolve(acceleration, np.ones((N,))/N, mode='same')
+plt.figure()
+plt.plot(np.arange(len(acceleration)),(acceleration-np.nanmin(acceleration))/(np.nanmax(acceleration)-np.nanmin(acceleration)))
+plt.plot(np.arange(len(Temp_rollingmean)),(Temp_rollingmean-np.min(Temp_rollingmean))/(np.max(Temp_rollingmean)-np.min(Temp_rollingmean)))
+plt.show()
